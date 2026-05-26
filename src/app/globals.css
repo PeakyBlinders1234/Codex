@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  background: #f6f8fb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    linear-gradient(180deg, rgba(15, 159, 143, 0.06), rgba(246, 248, 251, 0) 260px),
+    #f6f8fb;
+  color: #111827;
+  font-family: Inter, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.recharts-wrapper,
+.recharts-surface {
+  outline: none;
+}
