@@ -46,7 +46,7 @@ export class MockAIProvider implements AIProvider {
 export const mockAIProvider = new MockAIProvider();
 
 export const aiProviderIntegrationNote = `
-AIProvider 目前由 MockAIProvider 实现，保证面试演示稳定。
+AIProvider 目前由 MockAIProvider 实现，保证作品展示稳定。
 后续接入真实大模型时，可以新增 OpenAIProvider 或 ClaudeProvider：
 1. 保持 generateInsightSummary 和 generateReportAdvice 的入参不变。
 2. 将 ScenarioAnalysis 中的指标、异常和图表摘要序列化为 prompt。

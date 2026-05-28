@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "DataOps Copilot | AI 数据运营分析工作台",
-  description: "面向数据分析、数据运营、产品运营和产品经理面试展示的数据运营分析工作台"
+  description: "展示 AI 如何完成数据运营分析、异常识别、报告生成和行动建议的工作台"
 };
 
 export default function RootLayout({
@@ -12,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN">
+    <html lang="zh-CN" data-theme="dark">
       <body>{children}</body>
     </html>
   );

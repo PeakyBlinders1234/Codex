@@ -4,7 +4,7 @@ import { SeverityBadge } from "./StatusBadge";
 
 export function InsightsPanel({ insights }: { insights: Insight[] }) {
   return (
-    <section className="rounded-lg border border-line bg-white p-4 shadow-panel">
+    <section className="dashboard-panel rounded-lg p-4">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
           <h2 className="text-sm font-semibold text-ink">异常洞察</h2>
@@ -20,10 +20,10 @@ export function InsightsPanel({ insights }: { insights: Insight[] }) {
               <span className="text-xs text-muted">{insight.metricName}</span>
             </div>
             <h3 className="mt-2 text-sm font-semibold text-ink">{insight.title}</h3>
-            <p className="mt-2 text-xs leading-5 text-slate-600">{insight.description}</p>
+            <p className="mt-2 text-xs leading-5 text-muted">{insight.description}</p>
             <div className="mt-3 grid gap-2 text-xs leading-5 md:grid-cols-2">
-              <p className="rounded-md bg-white p-2 text-muted">{insight.evidence}</p>
-              <p className="rounded-md bg-white p-2 text-slate-700">
+              <p className="rounded-md border border-line bg-[rgba(var(--panel-rgb),0.66)] p-2 text-muted">{insight.evidence}</p>
+              <p className="rounded-md border border-line bg-[rgba(var(--panel-rgb),0.66)] p-2 text-ink">
                 <Target className="mr-1 inline h-3.5 w-3.5 text-accent" aria-hidden="true" />
                 {insight.recommendation}
               </p>
