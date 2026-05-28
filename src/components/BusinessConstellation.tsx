@@ -20,11 +20,11 @@ const typeIcon = {
 };
 
 function nodeColor(node: ConstellationNode) {
-  if (node.type === "scenario") return 0x8eeeff;
-  if (node.priority === "P0" || node.status === "risk") return 0xff6b8a;
-  if (node.priority === "P1" || node.status === "watch") return 0xffc857;
-  if (node.type === "action") return 0x8bd5ff;
-  return 0x38e8d2;
+  if (node.type === "scenario") return 0xbbe7db;
+  if (node.priority === "P0" || node.status === "risk") return 0xd76f7d;
+  if (node.priority === "P1" || node.status === "watch") return 0xd6b95c;
+  if (node.type === "action") return 0x7da0cf;
+  return 0x46a795;
 }
 
 function nodeTone(node: ConstellationNode) {
@@ -109,13 +109,13 @@ export function BusinessConstellation({
 
     const group = new THREE.Group();
     scene.add(group);
-    scene.add(new THREE.AmbientLight(0xc9f7ff, 0.58));
+    scene.add(new THREE.AmbientLight(0xf7fff9, 0.72));
 
-    const keyLight = new THREE.PointLight(0x8eeeff, 3.2, 10);
+    const keyLight = new THREE.PointLight(0xbbe7db, 2.2, 10);
     keyLight.position.set(1.6, 2.8, 4.4);
     scene.add(keyLight);
 
-    const glowLight = new THREE.PointLight(0xff8eb3, 1.1, 9);
+    const glowLight = new THREE.PointLight(0xd6f46d, 0.7, 9);
     glowLight.position.set(-2.6, -1.8, 3.2);
     scene.add(glowLight);
 
@@ -132,9 +132,9 @@ export function BusinessConstellation({
       const material = new THREE.MeshStandardMaterial({
         color,
         emissive: color,
-        emissiveIntensity: 0.42,
-        metalness: 0.24,
-        roughness: 0.38,
+        emissiveIntensity: 0.18,
+        metalness: 0.12,
+        roughness: 0.52,
         transparent: true,
         opacity: node.type === "scenario" ? 0.96 : 0.88
       });
@@ -155,9 +155,9 @@ export function BusinessConstellation({
 
       const geometry = new THREE.BufferGeometry().setFromPoints([source, target]);
       const material = new THREE.LineBasicMaterial({
-        color: 0x8eeeff,
+        color: 0x8ab6aa,
         transparent: true,
-        opacity: 0.12 + link.strength * 0.22
+        opacity: 0.08 + link.strength * 0.16
       });
       linkMaterials.push(material);
       group.add(new THREE.Line(geometry, material));
@@ -219,7 +219,7 @@ export function BusinessConstellation({
           (selectedMetricId ? record.node.linkedMetricId === selectedMetricId : false);
         const pulse = 1 + Math.sin(time * 0.002 + index) * 0.055;
         record.mesh.scale.setScalar(record.baseSize * pulse * (active ? 1.28 : 1));
-        record.material.emissiveIntensity = active ? 1.35 : 0.42;
+        record.material.emissiveIntensity = active ? 0.82 : 0.18;
         record.material.opacity = active ? 1 : record.node.type === "scenario" ? 0.94 : 0.82;
       });
 
@@ -256,9 +256,9 @@ export function BusinessConstellation({
       <div className="absolute inset-x-8 top-6 h-px bg-gradient-to-r from-transparent via-accent to-transparent opacity-70" />
       <div className="relative z-10 flex items-start justify-between gap-4 p-5">
         <div>
-          <p className="text-xs font-medium uppercase tracking-[0.22em] text-accent">Business Constellation</p>
-          <h2 className="mt-2 text-xl font-semibold text-ink">业务星图总控台</h2>
-          <p className="mt-1 max-w-lg text-xs leading-5 text-muted">指标、预警和行动任务被映射为同一张关系网络，点击节点可定位经营问题。</p>
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-accent">Interactive Data Field</p>
+          <h2 className="mt-2 text-xl font-semibold text-ink">AI 数据场景</h2>
+          <p className="mt-1 max-w-lg text-xs leading-5 text-muted">指标、预警和行动任务被组织成同一张关系网络，用空间层级解释业务状态。</p>
         </div>
         <div className="hidden rounded-full border border-accent bg-[rgba(var(--accent-rgb),0.12)] px-3 py-1 text-xs text-accent sm:block">
           {model.nodes.length} 个节点 · {model.links.length} 条关系

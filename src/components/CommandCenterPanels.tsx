@@ -171,7 +171,7 @@ export function ForecastPanel({ forecast }: { forecast: ForecastPoint[] }) {
       </div>
       <div className="h-[220px] min-w-0">
         {mounted ? (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
             <LineChart data={forecast} margin={{ top: 8, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid stroke="var(--line)" vertical={false} />
               <XAxis dataKey="date" tick={{ fontSize: 12, fill: "var(--muted)" }} tickLine={false} axisLine={false} />

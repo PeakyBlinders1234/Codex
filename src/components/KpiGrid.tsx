@@ -32,14 +32,14 @@ export function KpiGrid({
             type={onSelectMetric ? "button" : undefined}
             onClick={onSelectMetric ? () => onSelectMetric(metric) : undefined}
             className={`dashboard-panel w-full rounded-lg p-4 text-left transition ${
-              selected ? "border-accent bg-[rgba(var(--accent-rgb),0.12)] shadow-[0_0_32px_rgba(var(--accent-rgb),0.16)]" : "hover:border-accent"
-            } ${compact ? "min-h-[132px]" : ""}`}
+              selected ? "border-accent bg-[rgba(var(--accent-rgb),0.10)] shadow-[0_14px_28px_rgba(var(--accent-rgb),0.10)]" : "hover:-translate-y-0.5 hover:border-accent"
+            } ${compact ? "min-h-[118px]" : ""}`}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-sm text-muted">{metric.name}</p>
                 <div className="mt-2 flex items-baseline gap-2">
-                  <p className={`truncate font-semibold text-ink ${compact ? "text-xl" : "text-2xl"}`}>{metric.formattedValue}</p>
+                <p className={`truncate font-semibold text-ink ${compact ? "text-xl" : "text-2xl"}`}>{metric.formattedValue}</p>
                   <span className="text-xs text-muted">{metric.unit}</span>
                 </div>
               </div>

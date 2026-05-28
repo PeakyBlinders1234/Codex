@@ -18,34 +18,22 @@ export function DashboardHeader({
   const ThemeIcon = theme === "dark" ? SunMedium : Moon;
 
   return (
-    <header className="border-b border-line bg-[rgba(var(--panel-rgb),0.78)] backdrop-blur-xl">
-      <div className="mx-auto flex max-w-[1480px] flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-        <div className="min-w-0 space-y-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="relative flex h-11 w-11 items-center justify-center rounded-lg bg-accent text-slate-950 shadow-[0_0_28px_rgba(var(--accent-rgb),0.28)]">
-              <DatabaseZap className="h-5 w-5" aria-hidden="true" />
-              <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full border border-[var(--panel)] bg-success" />
-            </div>
-            <div>
-              <p className="text-xs font-medium uppercase tracking-[0.24em] text-accent">AI Ops Console</p>
-              <h1 className="text-xl font-semibold tracking-normal text-ink sm:text-2xl">DataOps Copilot</h1>
-              <p className="text-sm text-muted">AI 数据运营能力展示 · 异常识别 / 洞察解释 / 报告生成 / 行动建议</p>
-            </div>
-          </div>
-          <p className="max-w-3xl text-xs leading-5 text-muted">
-            这个 Demo 展示一条完整 AI 数据运营链路：输入业务数据，自动计算指标和风险，再生成可执行的经营摘要与行动闭环。
-          </p>
+    <header className="sticky top-0 z-30 border-b border-line bg-[rgba(var(--bg-rgb),0.78)] backdrop-blur-xl">
+      <div className="flex flex-col gap-3 px-4 py-3 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+        <div className="min-w-0">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-accent">Contemporary Data Studio</p>
+          <h1 className="truncate text-lg font-semibold tracking-normal text-ink">AI 数据运营能力展示</h1>
         </div>
-        <div className="grid gap-2 text-sm sm:grid-cols-2 lg:min-w-[680px] lg:grid-cols-4">
-          <div className="dashboard-chip rounded-lg px-3 py-2">
+        <div className="grid gap-2 text-sm sm:grid-cols-2 xl:min-w-[700px] xl:grid-cols-4">
+          <div className="dashboard-chip rounded-lg px-3 py-2 shadow-none">
             <p className="text-xs text-muted">当前场景</p>
             <p className="truncate font-medium text-ink">{scenario.name} · {scenario.shortName}</p>
           </div>
-          <div className="dashboard-chip rounded-lg px-3 py-2">
+          <div className="dashboard-chip rounded-lg px-3 py-2 shadow-none">
             <p className="text-xs text-muted">数据周期</p>
             <p className="truncate font-medium text-ink">{period}</p>
           </div>
-          <div className="dashboard-chip rounded-lg px-3 py-2">
+          <div className="dashboard-chip rounded-lg px-3 py-2 shadow-none">
             <p className="flex items-center gap-1 text-xs text-success">
               <Activity className="h-3.5 w-3.5" aria-hidden="true" />
               AI 引擎
@@ -55,18 +43,17 @@ export function DashboardHeader({
           <button
             type="button"
             onClick={() => onThemeChange(nextTheme)}
-            className="dashboard-chip flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-left transition hover:border-accent hover:text-accent"
+            className="dashboard-chip flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-left shadow-none transition hover:border-accent hover:text-accent"
             aria-label="切换主题"
           >
             <span>
               <span className="block text-xs text-muted">主题模式</span>
-              <span className="block font-medium text-ink">{theme === "dark" ? "深色科技" : "浅色专业"}</span>
+              <span className="block font-medium text-ink">{theme === "dark" ? "演示深色" : "浅色专业"}</span>
             </span>
             <ThemeIcon className="h-4 w-4 text-accent" aria-hidden="true" />
           </button>
         </div>
       </div>
-      <div className="h-px bg-gradient-to-r from-transparent via-accent to-transparent opacity-70" />
     </header>
   );
 }
@@ -88,12 +75,12 @@ export function AIWorkflowStrip({ command }: { command: CommandCenterAnalysis })
           const Icon = step.icon;
 
           return (
-            <div key={step.label} className="relative rounded-lg border border-line bg-[rgba(var(--panel-rgb),0.42)] px-3 py-3">
+            <div key={step.label} className="relative rounded-lg border border-line bg-[rgba(var(--panel-rgb),0.58)] px-3 py-3">
               {index < steps.length - 1 ? (
-                <span className="pointer-events-none absolute right-[-10px] top-1/2 z-10 hidden h-px w-5 bg-accent/60 xl:block" />
+                <span className="pointer-events-none absolute right-[-10px] top-1/2 z-10 hidden h-px w-5 bg-accent/30 xl:block" />
               ) : null}
               <div className="flex items-center gap-2">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[rgba(var(--accent-rgb),0.14)] text-accent">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[rgba(var(--accent-rgb),0.10)] text-accent">
                   <Icon className="h-4 w-4" aria-hidden="true" />
                 </span>
                 <span className="min-w-0">

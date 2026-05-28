@@ -68,7 +68,7 @@ function ChartPlaceholder({ chart, highlighted }: { chart: ChartSeries; highligh
 function LineChartPanel({ chart, highlighted }: { chart: ChartSeries; highlighted?: boolean }) {
   return (
     <ChartShell chart={chart} highlighted={highlighted}>
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
         <LineChart data={chart.data} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
           <CartesianGrid stroke="var(--line)" vertical={false} />
           <XAxis dataKey={chart.xKey} tick={{ fontSize: 12, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
@@ -96,7 +96,7 @@ function LineChartPanel({ chart, highlighted }: { chart: ChartSeries; highlighte
 function BarChartPanel({ chart, highlighted }: { chart: ChartSeries; highlighted?: boolean }) {
   return (
     <ChartShell chart={chart} highlighted={highlighted}>
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
         <BarChart data={chart.data} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
           <CartesianGrid stroke="var(--line)" vertical={false} />
           <XAxis dataKey={chart.xKey} tick={{ fontSize: 12, fill: "var(--muted)" }} tickLine={false} axisLine={false} interval={0} />
@@ -117,7 +117,7 @@ function HorizontalBarChartPanel({ chart, highlighted }: { chart: ChartSeries; h
 
   return (
     <ChartShell chart={chart} highlighted={highlighted}>
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
         <BarChart data={chart.data} layout="vertical" margin={{ top: 8, right: 20, bottom: 8, left: 0 }}>
           <CartesianGrid stroke="var(--line)" horizontal={false} />
           <XAxis type="number" tick={{ fontSize: 12, fill: "var(--muted)" }} tickLine={false} axisLine={false} />

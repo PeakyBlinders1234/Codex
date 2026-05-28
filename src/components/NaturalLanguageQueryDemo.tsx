@@ -163,9 +163,9 @@ export function NaturalLanguageQueryDemo() {
             <div>
               <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
                 <Search className="h-4 w-4 text-accent" aria-hidden="true" />
-                自然语言问数演示
+                AI Ask Bar
               </h2>
-              <p className="mt-1 text-xs leading-5 text-muted">演示 Aily 数据查询机器人里的补充询问机制：缺少校区 ID 或明确日期时，先反问，再查数。</p>
+              <p className="mt-1 text-xs leading-5 text-muted">用一条真实业务提问演示 Slot Filling：缺少校区 ID 或明确日期时，先反问，再查数。</p>
             </div>
             <span className="rounded-full border border-accent bg-[rgba(var(--accent-rgb),0.10)] px-3 py-1 text-xs text-accent">Slot Filling</span>
           </div>
@@ -273,7 +273,7 @@ export function NaturalLanguageQueryDemo() {
             <div>
               <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
                 <ClipboardCheck className="h-4 w-4 text-accent" aria-hidden="true" />
-                查询结果看板
+                查询结果工作区
               </h2>
               <p className="mt-1 text-xs text-muted">{result ? `${result.campusName} · ${result.startDate} 至 ${result.endDate}` : "补齐槽位后展示结果"}</p>
             </div>
@@ -291,7 +291,7 @@ export function NaturalLanguageQueryDemo() {
 
               <div className="h-[260px] min-w-0 rounded-lg border border-line bg-[rgba(var(--panel-rgb),0.35)] p-3">
                 {mounted ? (
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                     <BarChart data={result.rows} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
                       <CartesianGrid stroke="var(--line)" vertical={false} />
                       <XAxis dataKey="date" tickFormatter={(value) => String(value).slice(5)} tick={{ fontSize: 12, fill: "var(--muted)" }} tickLine={false} axisLine={false} />

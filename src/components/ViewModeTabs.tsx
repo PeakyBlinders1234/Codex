@@ -16,14 +16,16 @@ const modes: Array<{
 
 export function ViewModeTabs({
   active,
-  onChange
+  onChange,
+  variant = "sidebar"
 }: {
   active: DashboardViewMode;
   onChange: (mode: DashboardViewMode) => void;
+  variant?: "sidebar" | "strip";
 }) {
   return (
-    <section className="dashboard-panel rounded-lg p-2">
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+    <nav className={variant === "strip" ? "dashboard-panel rounded-lg p-2" : "space-y-2"} aria-label="工作台视图">
+      <div className={variant === "strip" ? "grid gap-2 sm:grid-cols-2 lg:grid-cols-5" : "grid gap-2"}>
         {modes.map((mode) => {
           const Icon = mode.icon;
           const selected = mode.id === active;
@@ -33,11 +35,15 @@ export function ViewModeTabs({
               key={mode.id}
               type="button"
               onClick={() => onChange(mode.id)}
-              className={`flex items-center gap-3 rounded-xl px-3 py-3 text-left transition ${
-                selected ? "bg-[rgba(var(--accent-rgb),0.18)] text-accent" : "text-muted hover:bg-[rgba(var(--panel-rgb),0.55)] hover:text-ink"
+              className={`group flex items-center gap-3 rounded-lg px-3 py-3 text-left transition ${
+                selected
+                  ? "bg-[rgba(var(--accent-rgb),0.14)] text-accent shadow-[inset_0_0_0_1px_rgba(var(--accent-rgb),0.20)]"
+                  : "text-muted hover:bg-[rgba(var(--panel-rgb),0.72)] hover:text-ink"
               }`}
             >
-              <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+              <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition ${selected ? "bg-accent text-white" : "bg-[rgba(var(--panel-rgb),0.72)] text-muted group-hover:text-accent"}`}>
+                <Icon className="h-4 w-4" aria-hidden="true" />
+              </span>
               <span className="min-w-0">
                 <span className="block text-sm font-semibold">{mode.label}</span>
                 <span className="block truncate text-xs opacity-80">{mode.description}</span>
@@ -46,6 +52,6 @@ export function ViewModeTabs({
           );
         })}
       </div>
-    </section>
+    </nav>
   );
 }
