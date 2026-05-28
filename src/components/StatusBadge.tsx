@@ -17,9 +17,9 @@ export function SeverityBadge({ severity }: { severity: InsightSeverity }) {
   }[severity];
 
   const className = {
-    info: "border-slate-200 bg-slate-50 text-slate-700",
-    warning: "border-amber-200 bg-amber-50 text-amber-700",
-    critical: "border-rose-200 bg-rose-50 text-rose-700"
+    info: "border-slate-400/30 bg-slate-400/10 text-muted",
+    warning: "border-amber-400/35 bg-amber-400/10 text-warning",
+    critical: "border-rose-400/35 bg-rose-400/10 text-danger"
   }[severity];
 
   return <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${className}`}>{label}</span>;

@@ -41,9 +41,9 @@ export function statusLabel(status: MetricStatus) {
 
 export function statusClass(status: MetricStatus) {
   const classes: Record<MetricStatus, string> = {
-    normal: "border-emerald-200 bg-emerald-50 text-emerald-700",
-    watch: "border-amber-200 bg-amber-50 text-amber-700",
-    risk: "border-rose-200 bg-rose-50 text-rose-700"
+    normal: "border-emerald-400/35 bg-emerald-400/10 text-success",
+    watch: "border-amber-400/35 bg-amber-400/10 text-warning",
+    risk: "border-rose-400/35 bg-rose-400/10 text-danger"
   };
 
   return classes[status];

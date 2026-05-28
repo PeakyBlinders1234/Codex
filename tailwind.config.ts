@@ -10,14 +10,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        surface: "#f6f8fb",
-        ink: "#111827",
-        muted: "#667085",
-        line: "#e4e7ec",
-        accent: "#0f9f8f"
+        surface: "var(--panel-strong)",
+        ink: "var(--ink)",
+        muted: "var(--muted)",
+        line: "var(--line)",
+        accent: "var(--accent)",
+        "accent-strong": "var(--accent-strong)",
+        danger: "var(--danger)",
+        warning: "var(--warning)",
+        success: "var(--success)",
+        cyan: "var(--cyan)"
       },
       boxShadow: {
-        panel: "0 1px 2px rgba(16, 24, 40, 0.05)"
+        panel: "var(--shadow-panel)"
       },
       fontFamily: {
         sans: [

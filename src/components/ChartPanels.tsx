@@ -35,9 +35,17 @@ function getCategoryAxisWidth(chart: ChartSeries) {
   return clamp(estimatedWidth, minimumWidth, 112);
 }
 
-function ChartShell({ chart, children }: { chart: ChartSeries; children: React.ReactNode }) {
+function ChartShell({
+  chart,
+  children,
+  highlighted = false
+}: {
+  chart: ChartSeries;
+  children: React.ReactNode;
+  highlighted?: boolean;
+}) {
   return (
-    <section className="min-w-0 rounded-lg border border-line bg-white p-4 shadow-panel">
+    <section className={`dashboard-panel min-w-0 rounded-lg p-4 transition ${highlighted ? "border-accent bg-[rgba(var(--accent-rgb),0.10)]" : ""}`}>
       <div className="mb-4">
         <h2 className="text-sm font-semibold text-ink">{chart.title}</h2>
         <p className="mt-1 text-xs leading-5 text-muted">{chart.description}</p>
@@ -47,9 +55,9 @@ function ChartShell({ chart, children }: { chart: ChartSeries; children: React.R
   );
 }
 
-function ChartPlaceholder({ chart }: { chart: ChartSeries }) {
+function ChartPlaceholder({ chart, highlighted }: { chart: ChartSeries; highlighted?: boolean }) {
   return (
-    <ChartShell chart={chart}>
+    <ChartShell chart={chart} highlighted={highlighted}>
       <div className="flex h-full items-center justify-center rounded-lg border border-dashed border-line bg-surface text-xs text-muted">
         图表加载中...
       </div>
@@ -57,16 +65,16 @@ function ChartPlaceholder({ chart }: { chart: ChartSeries }) {
   );
 }
 
-function LineChartPanel({ chart }: { chart: ChartSeries }) {
+function LineChartPanel({ chart, highlighted }: { chart: ChartSeries; highlighted?: boolean }) {
   return (
-    <ChartShell chart={chart}>
-      <ResponsiveContainer width="100%" height="100%">
+    <ChartShell chart={chart} highlighted={highlighted}>
+      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
         <LineChart data={chart.data} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
-          <CartesianGrid stroke="#eef2f6" vertical={false} />
-          <XAxis dataKey={chart.xKey} tick={{ fontSize: 12, fill: "#667085" }} tickLine={false} axisLine={false} />
-          <YAxis tick={{ fontSize: 12, fill: "#667085" }} tickLine={false} axisLine={false} width={48} />
-          <Tooltip formatter={formatTooltip} contentStyle={{ borderColor: "#e4e7ec", borderRadius: 8 }} />
-          <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
+          <CartesianGrid stroke="var(--line)" vertical={false} />
+          <XAxis dataKey={chart.xKey} tick={{ fontSize: 12, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
+          <YAxis tick={{ fontSize: 12, fill: "var(--muted)" }} tickLine={false} axisLine={false} width={48} />
+          <Tooltip formatter={formatTooltip} contentStyle={{ borderColor: "var(--line)", borderRadius: 8, background: "var(--panel)", color: "var(--ink)" }} />
+          <Legend iconType="circle" wrapperStyle={{ fontSize: 12, color: "var(--muted)" }} />
           {chart.yKeys.map((key) => (
             <Line
               key={key.key}
@@ -85,16 +93,16 @@ function LineChartPanel({ chart }: { chart: ChartSeries }) {
   );
 }
 
-function BarChartPanel({ chart }: { chart: ChartSeries }) {
+function BarChartPanel({ chart, highlighted }: { chart: ChartSeries; highlighted?: boolean }) {
   return (
-    <ChartShell chart={chart}>
-      <ResponsiveContainer width="100%" height="100%">
+    <ChartShell chart={chart} highlighted={highlighted}>
+      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
         <BarChart data={chart.data} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
-          <CartesianGrid stroke="#eef2f6" vertical={false} />
-          <XAxis dataKey={chart.xKey} tick={{ fontSize: 12, fill: "#667085" }} tickLine={false} axisLine={false} interval={0} />
-          <YAxis tick={{ fontSize: 12, fill: "#667085" }} tickLine={false} axisLine={false} width={48} />
-          <Tooltip formatter={formatTooltip} contentStyle={{ borderColor: "#e4e7ec", borderRadius: 8 }} />
-          <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
+          <CartesianGrid stroke="var(--line)" vertical={false} />
+          <XAxis dataKey={chart.xKey} tick={{ fontSize: 12, fill: "var(--muted)" }} tickLine={false} axisLine={false} interval={0} />
+          <YAxis tick={{ fontSize: 12, fill: "var(--muted)" }} tickLine={false} axisLine={false} width={48} />
+          <Tooltip formatter={formatTooltip} contentStyle={{ borderColor: "var(--line)", borderRadius: 8, background: "var(--panel)", color: "var(--ink)" }} />
+          <Legend iconType="circle" wrapperStyle={{ fontSize: 12, color: "var(--muted)" }} />
           {chart.yKeys.map((key) => (
             <Bar key={key.key} dataKey={key.key} name={key.name} fill={key.color} radius={[6, 6, 0, 0]} maxBarSize={48} />
           ))}
@@ -104,26 +112,26 @@ function BarChartPanel({ chart }: { chart: ChartSeries }) {
   );
 }
 
-function HorizontalBarChartPanel({ chart }: { chart: ChartSeries }) {
+function HorizontalBarChartPanel({ chart, highlighted }: { chart: ChartSeries; highlighted?: boolean }) {
   const categoryAxisWidth = getCategoryAxisWidth(chart);
 
   return (
-    <ChartShell chart={chart}>
-      <ResponsiveContainer width="100%" height="100%">
+    <ChartShell chart={chart} highlighted={highlighted}>
+      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
         <BarChart data={chart.data} layout="vertical" margin={{ top: 8, right: 20, bottom: 8, left: 0 }}>
-          <CartesianGrid stroke="#eef2f6" horizontal={false} />
-          <XAxis type="number" tick={{ fontSize: 12, fill: "#667085" }} tickLine={false} axisLine={false} />
+          <CartesianGrid stroke="var(--line)" horizontal={false} />
+          <XAxis type="number" tick={{ fontSize: 12, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
           <YAxis
             type="category"
             dataKey={chart.xKey}
-            tick={{ fontSize: 12, fill: "#344054" }}
+            tick={{ fontSize: 12, fill: "var(--ink)" }}
             tickMargin={8}
             tickLine={false}
             axisLine={false}
             interval={0}
             width={categoryAxisWidth}
           />
-          <Tooltip formatter={formatTooltip} contentStyle={{ borderColor: "#e4e7ec", borderRadius: 8 }} />
+          <Tooltip formatter={formatTooltip} contentStyle={{ borderColor: "var(--line)", borderRadius: 8, background: "var(--panel)", color: "var(--ink)" }} />
           <Bar dataKey={chart.yKeys[0].key} name={chart.yKeys[0].name} fill={chart.yKeys[0].color} radius={[0, 6, 6, 0]} />
         </BarChart>
       </ResponsiveContainer>
@@ -131,7 +139,12 @@ function HorizontalBarChartPanel({ chart }: { chart: ChartSeries }) {
   );
 }
 
-export function ChartPanels({ charts }: { charts: ChartSeries[] }) {
+function chartMatchesMetric(chart: ChartSeries, selectedMetricName?: string | null) {
+  if (!selectedMetricName) return false;
+  return chart.title.includes(selectedMetricName) || chart.yKeys.some((key) => key.name.includes(selectedMetricName) || selectedMetricName.includes(key.name));
+}
+
+export function ChartPanels({ charts, selectedMetricName }: { charts: ChartSeries[]; selectedMetricName?: string | null }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -142,7 +155,7 @@ export function ChartPanels({ charts }: { charts: ChartSeries[] }) {
     return (
       <section className="grid min-w-0 gap-3 xl:grid-cols-2">
         {charts.map((chart) => (
-          <ChartPlaceholder key={chart.id} chart={chart} />
+          <ChartPlaceholder key={chart.id} chart={chart} highlighted={chartMatchesMetric(chart, selectedMetricName)} />
         ))}
       </section>
     );
@@ -151,9 +164,11 @@ export function ChartPanels({ charts }: { charts: ChartSeries[] }) {
   return (
     <section className="grid min-w-0 gap-3 xl:grid-cols-2">
       {charts.map((chart) => {
-        if (chart.kind === "line") return <LineChartPanel key={chart.id} chart={chart} />;
-        if (chart.kind === "funnel" || chart.kind === "ranking") return <HorizontalBarChartPanel key={chart.id} chart={chart} />;
-        return <BarChartPanel key={chart.id} chart={chart} />;
+        const highlighted = chartMatchesMetric(chart, selectedMetricName);
+
+        if (chart.kind === "line") return <LineChartPanel key={chart.id} chart={chart} highlighted={highlighted} />;
+        if (chart.kind === "funnel" || chart.kind === "ranking") return <HorizontalBarChartPanel key={chart.id} chart={chart} highlighted={highlighted} />;
+        return <BarChartPanel key={chart.id} chart={chart} highlighted={highlighted} />;
       })}
     </section>
   );
