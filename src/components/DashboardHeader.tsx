@@ -18,11 +18,11 @@ export function DashboardHeader({
   const ThemeIcon = theme === "dark" ? SunMedium : Moon;
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-[rgba(var(--bg-rgb),0.78)] backdrop-blur-xl">
-      <div className="flex flex-col gap-3 px-4 py-3 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+    <header className="command-header sticky z-30">
+      <div className="flex flex-col gap-3 px-4 py-3 sm:px-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-accent">Contemporary Data Studio</p>
-          <h1 className="truncate text-lg font-semibold tracking-normal text-ink">AI 数据运营能力展示</h1>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">Contemporary Data Studio</p>
+          <h1 className="truncate text-xl font-semibold tracking-normal text-ink">DataOps Copilot · AI 数据运营能力展示</h1>
         </div>
         <div className="grid gap-2 text-sm sm:grid-cols-2 xl:min-w-[700px] xl:grid-cols-4">
           <div className="dashboard-chip rounded-lg px-3 py-2 shadow-none">

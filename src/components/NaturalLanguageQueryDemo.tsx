@@ -92,7 +92,7 @@ function ResultMetric({ label, value, detail }: { label: string; value: string; 
   );
 }
 
-export function NaturalLanguageQueryDemo() {
+export function NaturalLanguageQueryDemo({ variant = "page" }: { variant?: "page" | "drawer" }) {
   const defaultSlots = useMemo(() => extractOrderQuerySlots(secondPrompt), []);
   const defaultResult = useMemo(() => runOrderQuery(defaultSlots), [defaultSlots]);
   const [input, setInput] = useState(secondPrompt);
@@ -154,11 +154,19 @@ export function NaturalLanguageQueryDemo() {
   }
 
   const missingText = slots.missingSlots.length ? slots.missingSlots.map((slot) => missingSlotLabel[slot]).join("、") : "无缺失";
+  const isDrawer = variant === "drawer";
+  const rootClass = isDrawer ? "grid min-w-0 gap-4" : "grid min-w-0 gap-4 xl:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)]";
+  const panelClass = isDrawer ? "liquid-surface rounded-lg p-4" : "dashboard-panel rounded-lg p-4";
+  const messageListClass = isDrawer ? "max-h-[360px] space-y-3 overflow-y-auto pr-1" : "space-y-3";
+  const metricGridClass = isDrawer ? "grid gap-3 sm:grid-cols-2" : "grid gap-3 sm:grid-cols-2 xl:grid-cols-4";
+  const chartClass = isDrawer
+    ? "h-[220px] min-w-0 rounded-lg border border-line bg-[rgba(var(--panel-rgb),0.35)] p-3"
+    : "h-[260px] min-w-0 rounded-lg border border-line bg-[rgba(var(--panel-rgb),0.35)] p-3";
 
   return (
-    <section className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)]">
+    <section className={rootClass}>
       <div className="min-w-0 space-y-4">
-        <section className="dashboard-panel rounded-lg p-4">
+        <section className={panelClass}>
           <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
             <div>
               <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
@@ -170,7 +178,7 @@ export function NaturalLanguageQueryDemo() {
             <span className="rounded-full border border-accent bg-[rgba(var(--accent-rgb),0.10)] px-3 py-1 text-xs text-accent">Slot Filling</span>
           </div>
 
-          <div className="space-y-3">
+          <div className={messageListClass}>
             {messages.map((message) => {
               const isUser = message.role === "user";
               const Icon = isUser ? UserRound : Bot;
@@ -183,7 +191,7 @@ export function NaturalLanguageQueryDemo() {
                     </span>
                   ) : null}
                   <div
-                    className={`max-w-[82%] rounded-lg border px-3 py-2 text-sm leading-6 ${
+                    className={`${isDrawer ? "max-w-[86%]" : "max-w-[82%]"} rounded-lg border px-3 py-2 text-sm leading-6 ${
                       isUser ? "border-accent bg-[rgba(var(--accent-rgb),0.16)] text-ink" : "border-line bg-[rgba(var(--panel-rgb),0.58)] text-muted"
                     }`}
                   >
@@ -212,17 +220,17 @@ export function NaturalLanguageQueryDemo() {
               className="min-h-11 rounded-lg border border-line bg-[rgba(var(--panel-rgb),0.62)] px-3 text-sm text-ink outline-none transition placeholder:text-muted focus:border-accent"
               placeholder="输入：校区ID：123，2026-05-13-2026-05-19单量"
             />
-            <button type="submit" className="inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-slate-950 transition hover:opacity-90">
+            <button type="submit" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-slate-950 transition hover:opacity-90">
               <Play className="h-4 w-4" aria-hidden="true" />
               运行问数
             </button>
           </form>
 
           <div className="mt-3 flex flex-wrap gap-2">
-            <button type="button" onClick={replayMissingStep} className="rounded-lg border border-line px-3 py-2 text-xs text-muted transition hover:border-accent hover:text-accent">
+            <button type="button" onClick={replayMissingStep} className="min-h-11 rounded-lg border border-line px-3 py-2 text-xs text-muted transition hover:border-accent hover:text-accent">
               发送缺失信息问题
             </button>
-            <button type="button" onClick={replayCompletedFlow} className="rounded-lg border border-line px-3 py-2 text-xs text-muted transition hover:border-accent hover:text-accent">
+            <button type="button" onClick={replayCompletedFlow} className="min-h-11 rounded-lg border border-line px-3 py-2 text-xs text-muted transition hover:border-accent hover:text-accent">
               补齐槽位并显示结果
             </button>
             <button
@@ -233,7 +241,7 @@ export function NaturalLanguageQueryDemo() {
                 setResult(null);
                 setInput(firstPrompt);
               }}
-              className="inline-flex items-center gap-2 rounded-lg border border-line px-3 py-2 text-xs text-muted transition hover:border-accent hover:text-accent"
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-line px-3 py-2 text-xs text-muted transition hover:border-accent hover:text-accent"
             >
               <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
               重置
@@ -241,7 +249,7 @@ export function NaturalLanguageQueryDemo() {
           </div>
         </section>
 
-        <section className="dashboard-panel rounded-lg p-4">
+        <section className={panelClass}>
           <div className="mb-4 flex items-center justify-between gap-3">
             <div>
               <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
@@ -268,7 +276,7 @@ export function NaturalLanguageQueryDemo() {
       </div>
 
       <div className="min-w-0 space-y-4">
-        <section className="dashboard-panel rounded-lg p-4">
+        <section className={panelClass}>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
@@ -282,14 +290,14 @@ export function NaturalLanguageQueryDemo() {
 
           {result ? (
             <div className="space-y-4">
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div className={metricGridClass}>
                 <ResultMetric label="总单量" value={`${formatNumber(result.totalOrders)} 单`} detail={`环比 ${formatRateChange(result.changeRate)}`} />
                 <ResultMetric label="日均单量" value={`${formatNumber(result.averageDailyOrders)} 单`} detail="按 7 天平均" />
                 <ResultMetric label="峰值日期" value={result.peakDate.slice(5)} detail={`${formatNumber(result.peakDateOrders)} 单`} />
                 <ResultMetric label="校区ID" value={result.campusId} detail="潍坊工程南小区" />
               </div>
 
-              <div className="h-[260px] min-w-0 rounded-lg border border-line bg-[rgba(var(--panel-rgb),0.35)] p-3">
+              <div className={chartClass}>
                 {mounted ? (
                   <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                     <BarChart data={result.rows} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
@@ -312,7 +320,7 @@ export function NaturalLanguageQueryDemo() {
           )}
         </section>
 
-        <section className="dashboard-panel rounded-lg p-4">
+        <section className={panelClass}>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
@@ -325,7 +333,7 @@ export function NaturalLanguageQueryDemo() {
               type="button"
               onClick={copyExcelTable}
               disabled={!result}
-              className="inline-flex items-center gap-2 rounded-lg border border-line px-3 py-2 text-xs text-muted transition hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-line px-3 py-2 text-xs text-muted transition hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-50"
             >
               {copied ? <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" /> : <Clipboard className="h-3.5 w-3.5" aria-hidden="true" />}
               {copied ? "已复制" : "复制 Excel 表格"}
@@ -372,8 +380,8 @@ export function NaturalLanguageQueryDemo() {
           </div>
         </section>
 
-        <section className="grid gap-3 sm:grid-cols-2">
-          <div className="dashboard-chip rounded-lg p-3">
+        <section className={isDrawer ? "grid gap-3" : "grid gap-3 sm:grid-cols-2"}>
+          <div className="liquid-surface rounded-lg p-3">
             <p className="flex items-center gap-2 text-xs font-semibold text-ink">
               <CalendarDays className="h-4 w-4 text-accent" aria-hidden="true" />
               示例 SQL
@@ -384,7 +392,7 @@ WHERE campus_id = '123'
   AND date BETWEEN '2026-05-13' AND '2026-05-19'
 ORDER BY date;`}</pre>
           </div>
-          <div className="dashboard-chip rounded-lg p-3">
+          <div className="liquid-surface rounded-lg p-3">
             <p className="flex items-center gap-2 text-xs font-semibold text-ink">
               <CheckCircle2 className="h-4 w-4 text-accent" aria-hidden="true" />
               演示价值
