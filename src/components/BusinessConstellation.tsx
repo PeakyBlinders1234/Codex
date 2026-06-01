@@ -19,6 +19,11 @@ const typeIcon = {
   action: RadioTower
 };
 
+function smoothstep(edge0: number, edge1: number, value: number) {
+  const t = Math.max(0, Math.min(1, (value - edge0) / (edge1 - edge0)));
+  return t * t * (3 - 2 * t);
+}
+
 function nodeColor(node: ConstellationNode) {
   if (node.type === "scenario") return 0xbbe7db;
   if (node.priority === "P0" || node.status === "risk") return 0xd76f7d;
@@ -99,8 +104,12 @@ export function BusinessConstellation({
     const canvasElement = canvas;
     const hostElement = host;
 
-    const renderer = new THREE.WebGLRenderer({ canvas: canvasElement, alpha: true, antialias: true, preserveDrawingBuffer: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isMobile = window.innerWidth < 768;
+    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
+    const lowPower = reduceMotion || isMobile || deviceMemory <= 4;
+    const renderer = new THREE.WebGLRenderer({ canvas: canvasElement, alpha: true, antialias: !lowPower });
+    renderer.setPixelRatio(lowPower ? 1 : Math.min(window.devicePixelRatio, 1.25));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     const scene = new THREE.Scene();
@@ -126,7 +135,8 @@ export function BusinessConstellation({
     const positions = new Map<string, THREE.Vector3>();
     model.nodes.forEach((node, index) => positions.set(node.id, getNodePosition(node, index, groups)));
 
-    const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+    const sphereGeometry = new THREE.SphereGeometry(1, lowPower ? 14 : 20, lowPower ? 12 : 16);
+    const haloGeometry = new THREE.TorusGeometry(1, 0.018, 6, lowPower ? 28 : 40);
     const nodeRecords = model.nodes.map((node) => {
       const color = new THREE.Color(nodeColor(node));
       const material = new THREE.MeshStandardMaterial({
@@ -139,33 +149,83 @@ export function BusinessConstellation({
         opacity: node.type === "scenario" ? 0.96 : 0.88
       });
       const mesh = new THREE.Mesh(sphereGeometry, material);
-      mesh.position.copy(positions.get(node.id) ?? new THREE.Vector3());
+      const basePosition = (positions.get(node.id) ?? new THREE.Vector3()).clone();
+      mesh.position.copy(basePosition);
       mesh.scale.setScalar(nodeSize(node));
       mesh.userData.nodeId = node.id;
       group.add(mesh);
 
-      return { node, mesh, material, baseSize: nodeSize(node) };
+      const haloMaterial = new THREE.MeshBasicMaterial({
+        color,
+        transparent: true,
+        opacity: 0.1,
+        depthWrite: false
+      });
+      const halo = new THREE.Mesh(haloGeometry, haloMaterial);
+      halo.position.copy(basePosition);
+      halo.rotation.set(Math.PI * 0.5, 0, 0);
+      halo.scale.setScalar(nodeSize(node) * 2.3);
+      group.add(halo);
+
+      return { node, mesh, material, halo, haloMaterial, baseSize: nodeSize(node), basePosition };
     });
 
-    const linkMaterials: THREE.LineBasicMaterial[] = [];
+    const nodeMeshes = nodeRecords.map((record) => record.mesh);
+    const recordById = new Map(nodeRecords.map((record) => [record.node.id, record]));
+    const adjacency = new Map<string, Set<string>>();
     model.links.forEach((link) => {
-      const source = positions.get(link.source);
-      const target = positions.get(link.target);
-      if (!source || !target) return;
+      adjacency.set(link.source, (adjacency.get(link.source) ?? new Set()).add(link.target));
+      adjacency.set(link.target, (adjacency.get(link.target) ?? new Set()).add(link.source));
+    });
 
-      const geometry = new THREE.BufferGeometry().setFromPoints([source, target]);
+    const linkRecords: Array<{
+      line: THREE.Line;
+      material: THREE.LineBasicMaterial;
+      baseOpacity: number;
+      source: string;
+      target: string;
+      sourceRecord: (typeof nodeRecords)[number];
+      targetRecord: (typeof nodeRecords)[number];
+    }> = [];
+    model.links.forEach((link) => {
+      const sourceRecord = recordById.get(link.source);
+      const targetRecord = recordById.get(link.target);
+      if (!sourceRecord || !targetRecord) return;
+
+      const geometry = new THREE.BufferGeometry().setFromPoints([sourceRecord.basePosition, targetRecord.basePosition]);
+      const baseOpacity = 0.08 + link.strength * 0.16;
       const material = new THREE.LineBasicMaterial({
         color: 0x8ab6aa,
         transparent: true,
-        opacity: 0.08 + link.strength * 0.16
+        opacity: baseOpacity
       });
-      linkMaterials.push(material);
-      group.add(new THREE.Line(geometry, material));
+      const line = new THREE.Line(geometry, material);
+      linkRecords.push({ line, material, baseOpacity, source: link.source, target: link.target, sourceRecord, targetRecord });
+      group.add(line);
     });
 
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
+    const pointerWorld = new THREE.Vector2();
+    let pointerActive = false;
     let frame = 0;
+    let idleTimer = 0;
+    let pickFrame = 0;
+    let pendingPointerEvent: PointerEvent | null = null;
+    let isVisible = document.visibilityState === "visible";
+    let lastInteraction = performance.now();
+
+    function queueRender(delay = 0) {
+      if (reduceMotion || !isVisible || frame || idleTimer) return;
+      if (delay > 0) {
+        idleTimer = window.setTimeout(() => {
+          idleTimer = 0;
+          frame = window.requestAnimationFrame(animate);
+        }, delay);
+        return;
+      }
+      frame = window.requestAnimationFrame(animate);
+    }
 
     function resize() {
       const rect = hostElement.getBoundingClientRect();
@@ -180,51 +240,117 @@ export function BusinessConstellation({
       const rect = canvasElement.getBoundingClientRect();
       pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      pointerWorld.set(pointer.x * 3.35, pointer.y * 2.05);
+      pointerActive = true;
+      lastInteraction = performance.now();
       raycaster.setFromCamera(pointer, camera);
 
-      const hit = raycaster.intersectObjects(nodeRecords.map((record) => record.mesh))[0];
+      const hit = raycaster.intersectObjects(nodeMeshes, false)[0];
       const nodeId = hit?.object.userData.nodeId as string | undefined;
-      return nodeRecords.find((record) => record.node.id === nodeId)?.node ?? null;
+      return nodeId ? recordById.get(nodeId)?.node ?? null : null;
     }
 
     function handlePointerMove(event: PointerEvent) {
-      const node = pick(event);
-      const nextId = node?.id ?? null;
-      if (nextId !== hoverRef.current) {
-        hoverRef.current = nextId;
-        setHoveredNodeId(nextId);
-        canvasElement.style.cursor = nextId ? "pointer" : "default";
-      }
+      pendingPointerEvent = event;
+      if (pickFrame) return;
+      pickFrame = window.requestAnimationFrame(() => {
+        pickFrame = 0;
+        if (!pendingPointerEvent) return;
+        const node = pick(pendingPointerEvent);
+        pendingPointerEvent = null;
+        const nextId = node?.id ?? null;
+        if (nextId !== hoverRef.current) {
+          hoverRef.current = nextId;
+          setHoveredNodeId(nextId);
+          canvasElement.style.cursor = nextId ? "pointer" : "default";
+        }
+        if (idleTimer) {
+          window.clearTimeout(idleTimer);
+          idleTimer = 0;
+        }
+        queueRender();
+      });
     }
 
     function handlePointerLeave() {
       hoverRef.current = null;
+      pointerActive = false;
+      lastInteraction = performance.now();
       setHoveredNodeId(null);
       canvasElement.style.cursor = "default";
+      queueRender();
     }
 
     function handleClick(event: PointerEvent) {
       const node = pick(event);
       if (node) onSelectRef.current(node);
+      queueRender();
     }
 
     function animate(time: number) {
-      group.rotation.y = Math.sin(time * 0.00018) * 0.22;
-      group.rotation.x = Math.cos(time * 0.00014) * 0.08;
+      frame = 0;
+      if (!isVisible) return;
+      const focusedNodeId = hoverRef.current ?? selectedRef.current;
+      group.rotation.y = pointer.x * 0.1 + Math.sin(time * 0.00018) * 0.22;
+      group.rotation.x = -pointer.y * 0.06 + Math.cos(time * 0.00014) * 0.08;
 
       nodeRecords.forEach((record, index) => {
         const active =
           record.node.id === selectedRef.current ||
           record.node.id === hoverRef.current ||
           (selectedMetricId ? record.node.linkedMetricId === selectedMetricId : false);
+        const connected = focusedNodeId ? Boolean(adjacency.get(focusedNodeId)?.has(record.node.id)) : false;
+        const proximityDistance = pointerActive ? Math.hypot(record.basePosition.x - pointerWorld.x, record.basePosition.y - pointerWorld.y) : 3.6;
+        const proximity = pointerActive ? 1 - smoothstep(0.18, 1.55, proximityDistance) : 0;
         const pulse = 1 + Math.sin(time * 0.002 + index) * 0.055;
-        record.mesh.scale.setScalar(record.baseSize * pulse * (active ? 1.28 : 1));
-        record.material.emissiveIntensity = active ? 0.82 : 0.18;
-        record.material.opacity = active ? 1 : record.node.type === "scenario" ? 0.94 : 0.82;
+        const pull = proximity * (record.node.type === "scenario" ? 0.08 : 0.2);
+        record.mesh.position.set(
+          record.basePosition.x + (pointerWorld.x - record.basePosition.x) * pull,
+          record.basePosition.y + (pointerWorld.y - record.basePosition.y) * pull,
+          record.basePosition.z + proximity * 0.42 + Math.sin(time * 0.0015 + index) * 0.026
+        );
+        record.mesh.scale.setScalar(record.baseSize * pulse * (active ? 1.42 : connected ? 1.18 : 1 + proximity * 0.42));
+        record.material.emissiveIntensity = active ? 1.2 : connected ? 0.62 : 0.2 + proximity * 0.82;
+        record.material.opacity = active ? 1 : connected ? 0.96 : record.node.type === "scenario" ? 0.94 : 0.82 + proximity * 0.12;
+        record.halo.position.copy(record.mesh.position);
+        record.halo.rotation.z += 0.002 + proximity * 0.01;
+        record.halo.scale.setScalar(record.baseSize * (active ? 3.7 : connected ? 3.05 : 2.35 + proximity * 2.1));
+        record.haloMaterial.opacity = active ? 0.42 : connected ? 0.26 : 0.08 + proximity * 0.34;
+      });
+
+      linkRecords.forEach((record) => {
+        const related = Boolean(focusedNodeId) && (record.source === focusedNodeId || record.target === focusedNodeId);
+        const source = record.sourceRecord.mesh.position;
+        const target = record.targetRecord.mesh.position;
+        const positionAttribute = record.line.geometry.attributes.position as THREE.BufferAttribute;
+        positionAttribute.setXYZ(0, source.x, source.y, source.z);
+        positionAttribute.setXYZ(1, target.x, target.y, target.z);
+        positionAttribute.needsUpdate = true;
+        const midpointX = (source.x + target.x) / 2;
+        const midpointY = (source.y + target.y) / 2;
+        const proximity = pointerActive ? 1 - smoothstep(0.12, 1.72, Math.hypot(midpointX - pointerWorld.x, midpointY - pointerWorld.y)) : 0;
+        record.material.opacity = related ? Math.min(0.72, record.baseOpacity + 0.34 + proximity * 0.18) : record.baseOpacity + proximity * 0.2;
+        record.material.color.setHex(related || proximity > 0.18 ? 0x65d9c9 : 0x8ab6aa);
       });
 
       renderer.render(scene, camera);
-      frame = window.requestAnimationFrame(animate);
+      const timeSinceInteraction = time - lastInteraction;
+      if (timeSinceInteraction < 5000) queueRender(timeSinceInteraction > 1600 ? 260 : 0);
+    }
+
+    function handleVisibilityChange() {
+      isVisible = document.visibilityState === "visible";
+      if (!isVisible) {
+        window.cancelAnimationFrame(frame);
+        window.cancelAnimationFrame(pickFrame);
+        window.clearTimeout(idleTimer);
+        frame = 0;
+        pickFrame = 0;
+        idleTimer = 0;
+        return;
+      }
+      lastInteraction = performance.now();
+      queueRender();
     }
 
     const resizeObserver = new ResizeObserver(resize);
@@ -232,18 +358,26 @@ export function BusinessConstellation({
     canvasElement.addEventListener("pointermove", handlePointerMove);
     canvasElement.addEventListener("pointerleave", handlePointerLeave);
     canvasElement.addEventListener("pointerdown", handleClick);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     resize();
-    frame = window.requestAnimationFrame(animate);
+    animate(performance.now());
 
     return () => {
       window.cancelAnimationFrame(frame);
+      window.cancelAnimationFrame(pickFrame);
+      window.clearTimeout(idleTimer);
       resizeObserver.disconnect();
       canvasElement.removeEventListener("pointermove", handlePointerMove);
       canvasElement.removeEventListener("pointerleave", handlePointerLeave);
       canvasElement.removeEventListener("pointerdown", handleClick);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       sphereGeometry.dispose();
-      nodeRecords.forEach((record) => record.material.dispose());
-      linkMaterials.forEach((material) => material.dispose());
+      haloGeometry.dispose();
+      nodeRecords.forEach((record) => {
+        record.material.dispose();
+        record.haloMaterial.dispose();
+      });
+      linkRecords.forEach((record) => record.material.dispose());
       group.traverse((object: THREE.Object3D) => {
         if (object instanceof THREE.Line) object.geometry.dispose();
       });

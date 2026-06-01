@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "node scripts/preview-static.mjs",
     "preview": "node scripts/preview-static.mjs",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "liquid-glass-react": "^1.1.1",
     "lucide-react": "1.16.0",
     "next": "16.2.6",
     "react": "19.2.6",

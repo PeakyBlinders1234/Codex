@@ -1,4 +1,4 @@
-import { BarChart3, BrainCircuit, ClipboardCheck, Search, Sparkles } from "lucide-react";
+import { BarChart3, BrainCircuit, ClipboardCheck, Sparkles } from "lucide-react";
 import type { DashboardViewMode } from "@/types";
 
 const modes: Array<{
@@ -9,7 +9,6 @@ const modes: Array<{
 }> = [
   { id: "command", label: "总控", description: "AI 指挥舱", icon: BrainCircuit },
   { id: "analysis", label: "分析", description: "KPI、图表、SQL", icon: BarChart3 },
-  { id: "query", label: "问数", description: "补充询问机制", icon: Search },
   { id: "action", label: "行动", description: "预警和任务闭环", icon: ClipboardCheck },
   { id: "capability", label: "能力", description: "AI 工作流说明", icon: Sparkles }
 ];
@@ -21,11 +20,37 @@ export function ViewModeTabs({
 }: {
   active: DashboardViewMode;
   onChange: (mode: DashboardViewMode) => void;
-  variant?: "sidebar" | "strip";
+  variant?: "sidebar" | "strip" | "rail";
 }) {
+  if (variant === "rail") {
+    return (
+      <nav className="rail-tabs" aria-label="工作台视图">
+        {modes.map((mode) => {
+          const Icon = mode.icon;
+          const selected = mode.id === active;
+
+          return (
+            <button
+              key={mode.id}
+              type="button"
+              onClick={() => onChange(mode.id)}
+              className={`rail-tab group ${selected ? "is-active" : ""}`}
+              title={`${mode.label}：${mode.description}`}
+            >
+              <span className="rail-tab-icon">
+                <Icon className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <span className="text-[11px] font-semibold">{mode.label}</span>
+            </button>
+          );
+        })}
+      </nav>
+    );
+  }
+
   return (
     <nav className={variant === "strip" ? "dashboard-panel rounded-lg p-2" : "space-y-2"} aria-label="工作台视图">
-      <div className={variant === "strip" ? "grid gap-2 sm:grid-cols-2 lg:grid-cols-5" : "grid gap-2"}>
+      <div className={variant === "strip" ? "grid gap-2 sm:grid-cols-2 lg:grid-cols-4" : "grid gap-2"}>
         {modes.map((mode) => {
           const Icon = mode.icon;
           const selected = mode.id === active;

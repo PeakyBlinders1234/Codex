@@ -14,7 +14,7 @@ export type AlertPriority = "P0" | "P1" | "P2";
 
 export type ActionStatus = "待处理" | "推进中" | "本周验证";
 
-export type DashboardViewMode = "command" | "analysis" | "query" | "action" | "capability";
+export type DashboardViewMode = "command" | "analysis" | "action" | "capability";
 
 export type AlertFilter = AlertPriority | "all";
 

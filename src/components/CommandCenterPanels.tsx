@@ -112,13 +112,13 @@ export function AlertQueuePanel({
         <span className="rounded-full border border-line px-2 py-1 text-xs text-muted">{filteredAlerts.length} 条</span>
       </div>
       {onFilterChange ? (
-        <div className="mb-4 grid grid-cols-4 gap-1 rounded-xl border border-line bg-[rgba(var(--panel-rgb),0.45)] p-1">
+        <div className="mb-4 grid grid-cols-2 gap-2 rounded-xl border border-line bg-[rgba(var(--panel-rgb),0.45)] p-1 sm:grid-cols-4">
           {(["all", "P0", "P1", "P2"] as AlertFilter[]).map((item) => (
             <button
               key={item}
               type="button"
               onClick={() => onFilterChange(item)}
-              className={`rounded-lg px-2 py-1.5 text-xs transition ${filter === item ? "bg-[rgba(var(--accent-rgb),0.18)] text-accent" : "text-muted hover:text-ink"}`}
+              className={`min-h-11 rounded-lg px-2 py-2 text-xs transition ${filter === item ? "bg-[rgba(var(--accent-rgb),0.18)] text-accent" : "text-muted hover:text-ink"}`}
             >
               {item === "all" ? "全部" : item}
             </button>
@@ -231,13 +231,13 @@ export function ActionBoard({
               <span className="text-accent">影响：{item.impact}</span>
             </div>
             {onStatusChange ? (
-              <div className="mt-3 grid grid-cols-3 gap-1 rounded-xl border border-line bg-[rgba(var(--panel-rgb),0.42)] p-1">
+              <div className="mt-3 grid gap-2 rounded-xl border border-line bg-[rgba(var(--panel-rgb),0.42)] p-1 sm:grid-cols-3">
                 {actionStatuses.map((status) => (
                   <button
                     key={status}
                     type="button"
                     onClick={() => onStatusChange(item.id, status)}
-                    className={`rounded-lg px-2 py-1.5 text-xs transition ${item.status === status ? "bg-[rgba(var(--accent-rgb),0.18)] text-accent" : "text-muted hover:text-ink"}`}
+                    className={`min-h-11 rounded-lg px-2 py-2 text-xs transition ${item.status === status ? "bg-[rgba(var(--accent-rgb),0.18)] text-accent" : "text-muted hover:text-ink"}`}
                   >
                     {status}
                   </button>
